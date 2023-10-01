@@ -36,7 +36,7 @@ const App = () => {
     const [overlayMenuActive, setOverlayMenuActive] = useState(false);
     const [mobileMenuActive, setMobileMenuActive] = useState(false);
     const [mobileTopbarMenuActive, setMobileTopbarMenuActive] = useState(false);
-    const { auteticado } = LoginService();
+    const loginService = new LoginService();
     const copyTooltipRef = useRef();
     const location = useLocation();
 
@@ -303,7 +303,7 @@ const App = () => {
     return (
         <div>
             {
-                auteticado() ?
+                loginService.autenticado() ?
                 <Pagina/>
                 :
                 <Login/>

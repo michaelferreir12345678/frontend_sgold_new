@@ -1,36 +1,40 @@
 import axios from "axios";
+import { ServiceBase } from "./ServiceBase.js";
 
-export class metaAtuarialService {
+export class metaAtuarialService extends ServiceBase {
 
-    url = 'http://localhost:8080/api/servico/'
-    async listarTodos() {
-        return await axios({
-            method: "get",
-            url: 'http://localhost:8080/api/servico/',
-        })
-    };
-
-    async inserir(objeto) {
-        return await axios({
-            method: 'post',
-            url: 'http://localhost:8080/api/servico/',
-            data: objeto,
-        })
+    constructor(){
+        super('servico');
     }
 
+    // async listarTodos() {
+    //     return await axios({
+    //         method: "get",
+    //         url: 'http://localhost:8080/api/servico/',
+    //     })
+    // };
 
-    async alterar(objeto) {
-        return await axios({
-            method: 'put',
-            url: 'http://localhost:8080/api/servico/',
-            data: objeto,
-        })
-    }
+    // async inserir(objeto) {
+    //     return await axios({
+    //         method: 'post',
+    //         url: 'http://localhost:8080/api/servico/',
+    //         data: objeto,
+    //     })
+    // }
 
-    async excluir(id) {
-        return await axios({
-            method: 'delete',
-            url: 'http://localhost:8080/api/servico/'+id,
-        })
-    }
+
+    // async alterar(objeto) {
+    //     return await axios({
+    //         method: 'put',
+    //         url: 'http://localhost:8080/api/servico/',
+    //         data: objeto,
+    //     })
+    // }
+
+    // async excluir(id) {
+    //     return await axios({
+    //         method: 'delete',
+    //         url: 'http://localhost:8080/api/servico/' + id,
+    //     })
+    // }
 }
