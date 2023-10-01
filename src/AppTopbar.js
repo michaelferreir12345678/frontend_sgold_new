@@ -1,14 +1,17 @@
 import React  from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
+import { LoginService } from './service/util/LoginService';
 
 export const AppTopbar = (props) => {
+
+    const loginService = new LoginService();
 
     return (
         <div className="layout-topbar">
             <Link to="/" className="layout-topbar-logo">
                 <img src={props.layoutColorMode === 'light' ? 'assets/layout/images/logo-dark.svg' : 'assets/layout/images/logo-white.svg'} alt="logo"/>
-                <span>SAKAI</span>
+                <span>SG.Prev</span>
             </Link>
 
             <button type="button" className="p-link  layout-menu-button layout-topbar-button" onClick={props.onToggleMenuClick}>
@@ -33,9 +36,9 @@ export const AppTopbar = (props) => {
                         </button>
                     </li>
                     <li>
-                        <button className="p-link layout-topbar-button" onClick={props.onMobileSubTopbarMenuClick}>
+                        <button className="p-link layout-topbar-button" onClick={()=>loginService.sair()}>
                             <i className="pi pi-user"/>
-                            <span>Profile</span>
+                            <span>Sair</span>
                         </button>
                     </li>
                 </ul>

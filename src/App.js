@@ -44,6 +44,9 @@ import './assets/demo/flags/flags.css';
 import './assets/demo/Demos.scss';
 import './assets/layout/layout.scss';
 import './App.scss';
+import MetaAtuarial from './pages/MetaAtuarial';
+import Login from './pages/Login';
+import { LoginService } from './service/util/LoginService';
 
 const App = () => {
     const [layoutMode, setLayoutMode] = useState('static');
@@ -56,6 +59,7 @@ const App = () => {
     const [mobileTopbarMenuActive, setMobileTopbarMenuActive] = useState(false);
     const copyTooltipRef = useRef();
     const location = useLocation();
+    const loginService = new LoginService();
 
     PrimeReact.ripple = true;
 
@@ -205,57 +209,98 @@ const App = () => {
             ]
         },
         {
-            label: 'Menu Hierarchy', icon: 'pi pi-fw pi-search',
+            label: 'Menu',
             items: [
                 {
-                    label: 'Submenu 1', icon: 'pi pi-fw pi-bookmark',
+                    label: 'Política de investimento',
                     items: [
                         {
-                            label: 'Submenu 1.1', icon: 'pi pi-fw pi-bookmark',
-                            items: [
-                                { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark' },
-                            ]
+                            label: 'Meta Atuarial',
+                            icon: 'pi pi-fw pi-pencil',
+                            to: '/pages/meta-atuarial'
                         },
                         {
-                            label: 'Submenu 1.2', icon: 'pi pi-fw pi-bookmark',
-                            items: [
-                                { label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 1.2.2', icon: 'pi pi-fw pi-bookmark' }
-                            ]
+                            label: 'Política de investimento',
+                        }, {
+                            label: 'Limites Legais - Resolução',
+                        }, {
+                            label: 'Grupos de fundos de investimentos',
                         },
                     ]
                 },
                 {
-                    label: 'Submenu 2', icon: 'pi pi-fw pi-bookmark',
+                    label: 'Carteira',
                     items: [
                         {
-                            label: 'Submenu 2.1', icon: 'pi pi-fw pi-bookmark',
-                            items: [
-                                { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 2.1.3', icon: 'pi pi-fw pi-bookmark' },
-                            ]
+                            label: 'Composição',
                         },
                         {
-                            label: 'Submenu 2.2', icon: 'pi pi-fw pi-bookmark',
-                            items: [
-                                { label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 2.2.2', icon: 'pi pi-fw pi-bookmark' }
-                            ]
-                        }
+                            label: 'Movimentações',
+                        },
+                        {
+                            label: 'Saldo do dia',
+                        },
+                        {
+                            label: 'Movimentações ativo',
+                        },
                     ]
-                }
+                },
+                {
+                    label: 'Performance',
+                    items: [
+                        {
+                            label: 'Carteira vs Meta',
+                        },
+                        {
+                            label: 'Carteira vs Meta por Ano',
+                        },
+                        {
+                            label: 'Performance Carteira',
+                        },
+                        {
+                            label: 'Análise de Risco Carteira',
+                        },
+                        {
+                            label: 'Comparador de Fundos',
+                        },
+                        {
+                            label: 'Acompanhamento de Fundos',
+                        },
+
+                    ]
+                },
+                {
+                    label: 'Aplicação Financeira',
+                    items: [
+                        {
+                            label: 'Fronteira de Eficiência',
+                        },
+                        {
+                            label: 'Carteiras Livres',
+                        },
+                    ]
+                },
+                {
+                    label: 'Asset Liability Management',
+                    items: [
+                        {
+                            label: 'ALM - Modelo Cash Flow Matching',
+                        },
+                    ]
+                },
+                {
+                    label: 'Mercado',
+                    items: [
+                        {
+                            label: 'Expectativas do Mercado',
+                        },
+                        {
+                            label: 'Indexadores',
+                        },
+                    ]
+                },
             ]
         },
-        {
-            label: 'Get Started',
-            items: [
-                { label: 'Documentation', icon: 'pi pi-fw pi-question', command: () => { window.location = "#/documentation" } },
-                { label: 'View Source', icon: 'pi pi-fw pi-search', command: () => { window.location = "https://github.com/primefaces/sakai-react" } }
-            ]
-        }
     ];
 
     const addClass = (element, className) => {
@@ -283,8 +328,9 @@ const App = () => {
         'layout-theme-light': layoutColorMode === 'light'
     });
 
-    return (
-        <div className={wrapperClass} onClick={onWrapperClick}>
+    const Pagina = () => {
+        return (
+            <div className={wrapperClass} onClick={onWrapperClick}>
             <Tooltip ref={copyTooltipRef} target=".block-action-copy" position="bottom" content="Copied to clipboard" event="focus" />
 
             <AppTopbar onToggleMenuClick={onToggleMenuClick} layoutColorMode={layoutColorMode}
@@ -318,7 +364,9 @@ const App = () => {
                     <Route path="/timeline" component={TimelineDemo} />
                     <Route path="/crud" component={Crud} />
                     <Route path="/empty" component={EmptyPage} />
-                    <Route path="/documentation" component={Documentation} />
+                    <Route path="/documentation" component={Documentation}/>
+                    <Route path="/pages/meta-atuarial" component={MetaAtuarial}/>
+                    <Route path="/login" component={Login}/>
                 </div>
 
                 <AppFooter layoutColorMode={layoutColorMode} />
@@ -332,6 +380,18 @@ const App = () => {
             </CSSTransition>
 
         </div>
+        )
+    }
+
+    return (
+        <div>
+            {
+                /*loginService.auteticado()*/true ?
+                <Pagina/>
+                :
+                <Login/>
+            }
+        </div>        
     );
 
 }
