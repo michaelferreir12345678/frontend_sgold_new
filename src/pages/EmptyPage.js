@@ -6,8 +6,8 @@ const EmptyPage = () => {
         <div className="grid">
             <div className="col-12">
                 <div className="card">
-                    <h5>Empty Page</h5>
-                    <p>Use this page to start from scratch and place your custom content.</p>
+                    <h5>Página Vazia</h5>
+                    <p>Página vazia para usar em outros momentos.</p>
                 </div>
             </div>
         </div>

@@ -4,7 +4,6 @@ import { Button } from 'primereact/button';
 import { Chart } from 'primereact/chart';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { ProductService } from '../service/ProductService';
 
 const pieData = {
     labels: ['Art. 7º, I -a', 'Art. 7º, I - b', 'Art. 7º, III -a'],
@@ -117,10 +116,12 @@ const Dashboard = (props) => {
         setLineOptions(lineOptions)
     }
 
-    useEffect(() => {
-        const productService = new ProductService();
-        productService.getProductsSmall().then(data => setProducts(data));
-    }, []);
+    //Teste para atualização do conteúdo da tabela de "Carteira por enquadramento"
+
+    // useEffect(() => {
+    //     const productService = new ProductService();
+    //     productService.getProductsSmall().then(data => setProducts(data));
+    // }, []);     
 
     useEffect(() => {
         if (props.colorMode === 'light') {
