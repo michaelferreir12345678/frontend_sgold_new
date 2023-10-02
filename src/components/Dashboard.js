@@ -1,385 +1,402 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Menu } from 'primereact/menu';
+import { Button } from 'primereact/button';
+import { Chart } from 'primereact/chart';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 
-import React, { Component } from 'react';
-import {CarService} from '../service/CarService';
-import {Panel} from 'primereact/components/panel/Panel';
-import {Checkbox} from 'primereact/components/checkbox/Checkbox';
-import {Button} from 'primereact/components/button/Button';
-import {Dropdown} from 'primereact/components/dropdown/Dropdown';
-import {InputText} from 'primereact/components/inputtext/InputText';
-import {Chart} from 'primereact/components/chart/Chart';
-import {DataTable} from 'primereact/components/datatable/DataTable';
-import {Column} from 'primereact/components/column/Column';
-import {Schedule} from 'primereact/components/schedule/Schedule';
-
-export class Dashboard extends Component {
-
-    constructor() {
-        super();
-        this.state = {
-            tasks: [],
-            city: null,
-            selectedCar: null
-        };
-        this.onTaskChange = this.onTaskChange.bind(this);
-        this.onCityChange = this.onCityChange.bind(this);
-        this.carservice = new CarService();
-    }
-
-    onTaskChange(e) {
-        let selectedTasks = [...this.state.tasks];
-        if(e.checked)
-            selectedTasks.push(e.value);
-        else
-            selectedTasks.splice(selectedTasks.indexOf(e.value), 1);
-
-        this.setState({tasks: selectedTasks});
-    }
-
-    onCityChange(e) {
-        this.setState({city: e.value});
-    }
-
-    componentDidMount() {
-        this.carservice.getCarsSmall().then(data => this.setState({cars: data}));
-    }
-
-    render() {
-        let cities = [
-            {label:'New York', value:{id:1, name: 'New York', code: 'NY'}},
-            {label:'Rome', value:{id:2, name: 'Rome', code: 'RM'}},
-            {label:'London', value:{id:3, name: 'London', code: 'LDN'}},
-            {label:'Istanbul', value:{id:4, name: 'Istanbul', code: 'IST'}},
-            {label:'Paris', value:{id:5, name: 'Paris', code: 'PRS'}}
-        ];
-
-        let scheduleHeader = {
-			left: 'prev,next today',
-			center: 'title',
-			right: 'month,agendaWeek,agendaDay'
-		};
-
-        let events = [
-			{
-				"id": 1,
-				"title": "All Day Event",
-				"start": "2017-02-01"
-			},
-			{
-				"id": 2,
-				"title": "Long Event",
-				"start": "2017-02-07",
-				"end": "2017-02-10"
-			},
-			{
-				"id": 3,
-				"title": "Repeating Event",
-				"start": "2017-02-09T16:00:00"
-			},
-			{
-				"id": 4,
-				"title": "Repeating Event",
-				"start": "2017-02-16T16:00:00"
-			},
-			{
-				"id": 5,
-				"title": "Conference",
-				"start": "2017-02-11",
-				"end": "2017-02-13"
-			},
-			{
-				"id": 6,
-				"title": "Meeting",
-				"start": "2017-02-12T10:30:00",
-				"end": "2017-02-12T12:30:00"
-			},
-			{
-				"id": 7,
-				"title": "Lunch",
-				"start": "2017-02-12T12:00:00"
-			},
-			{
-				"id": 8,
-				"title": "Meeting",
-				"start": "2017-02-12T14:30:00"
-			},
-			{
-				"id": 9,
-				"title": "Happy Hour",
-				"start": "2017-02-12T17:30:00"
-			},
-			{
-				"id": 10,
-				"title": "Dinner",
-				"start": "2017-02-12T20:00:00"
-			},
-			{
-				"id": 11,
-				"title": "Birthday Party",
-				"start": "2017-02-13T07:00:00"
-			},
-			{
-				"id": 12,
-				"title": "Click for Google",
-				"url": "http://google.com/",
-				"start": "2017-02-28"
-			}
-		];
-
-        let lineData = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [
-                {
-                    label: 'First Dataset',
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    fill: false,
-                    borderColor: '#007be5'
-                },
-                {
-                    label: 'Second Dataset',
-                    data: [28, 48, 40, 19, 86, 27, 90],
-                    fill: false,
-                    borderColor: '#20d077'
-                }
+const pieData = {
+    labels: ['Art. 7º, I -a', 'Art. 7º, I - b', 'Art. 7º, III -a'],
+    datasets: [
+        {
+            data: [300, 50, 100],
+            backgroundColor: [
+                "#FF6384",
+                "#36A2EB",
+                "#FFCE56"
+            ],
+            hoverBackgroundColor: [
+                "#FF6384",
+                "#36A2EB",
+                "#FFCE56"
             ]
+        }
+    ]
+};
+
+const lineData = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    datasets: [
+        {
+            label: 'Renda Fixa',
+            data: [65, 59, 80, 81, 56, 55, 40],
+            fill: false,
+            backgroundColor: '#2f4860',
+            borderColor: '#2f4860',
+            tension: .4
+        },
+        {
+            label: 'Renda Variável',
+            data: [28, 48, 40, 19, 86, 27, 90],
+            fill: false,
+            backgroundColor: '#00bb7e',
+            borderColor: '#00bb7e',
+            tension: .4
+        }
+    ]
+};
+
+const Dashboard = (props) => {
+    const [products, setProducts] = useState(null);
+    const menu1 = useRef(null);
+    const menu2 = useRef(null);
+    const [lineOptions, setLineOptions] = useState(null)
+
+    const applyLightTheme = () => {
+        const lineOptions = {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#495057'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#495057'
+                    },
+                    grid: {
+                        color: '#ebedef',
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: '#495057'
+                    },
+                    grid: {
+                        color: '#ebedef',
+                    }
+                },
+            }
         };
 
-        return <div className="ui-g ui-fluid dashboard">
-            <div className="ui-g-12 ui-md-4">
-                <div className="card clearfix summary">
-                    <span className="title">Users</span>
-                    <span className="detail">Number of visitors</span>
-                    <span className="count visitors">12</span>
+        setLineOptions(lineOptions)
+    }
+
+    const applyDarkTheme = () => {
+        const lineOptions = {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#ebedef'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#ebedef'
+                    },
+                    grid: {
+                        color: 'rgba(160, 167, 181, .3)',
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: '#ebedef'
+                    },
+                    grid: {
+                        color: 'rgba(160, 167, 181, .3)',
+                    }
+                },
+            }
+        };
+
+        setLineOptions(lineOptions)
+    }
+
+    //Teste para atualização do conteúdo da tabela de "Carteira por enquadramento"
+
+    // useEffect(() => {
+    //     const productService = new ProductService();
+    //     productService.getProductsSmall().then(data => setProducts(data));
+    // }, []);     
+
+    useEffect(() => {
+        if (props.colorMode === 'light') {
+            applyLightTheme();
+        } else {
+            applyDarkTheme();
+        }
+    }, [props.colorMode]);
+
+    const formatCurrency = (value) => {
+        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    };
+
+    return (
+        <div className="grid">
+            <div className="col-12 lg:col-6 xl:col-3">
+                <div className="card mb-0">
+                    <div className="flex justify-content-between mb-3">
+                        <div>
+                            <span className="block text-500 font-medium mb-3">Composição ativos carteira atual</span>
+                            <div className="text-900 font-medium text-xl">152</div>
+                        </div>
+                        <div className="flex align-items-center justify-content-center bg-blue-100 border-round" style={{ width: '2.5rem', height: '2.5rem' }}>
+                            <i className="pi pi-arrow-up-right text-blue-500 text-xl" />
+                        </div>
+                    </div>
+                    <span className="text-green-500 font-medium">24 novos </span>
+                    <span className="text-500">desde a última visita</span>
                 </div>
             </div>
-            <div className="ui-g-12 ui-md-4">
-                <div className="card clearfix summary">
-                    <span className="title">Sales</span>
-                    <span className="detail">Number of purchases</span>
-                    <span className="count purchases">534</span>
+            <div className="col-12 lg:col-6 xl:col-3">
+                <div className="card mb-0">
+                    <div className="flex justify-content-between mb-3">
+                        <div>
+                            <span className="block text-500 font-medium mb-3">Movimentações</span>
+                            <div className="text-900 font-medium text-xl">R$ 2.100.454,00</div>
+                        </div>
+                        <div className="flex align-items-center justify-content-center bg-orange-100 border-round" style={{ width: '2.5rem', height: '2.5rem' }}>
+                            <i className="pi pi-map-marker text-orange-500 text-xl" />
+                        </div>
+                    </div>
+                    <span className="text-green-500 font-medium">%52+ </span>
+                    <span className="text-500">desde a última semana</span>
                 </div>
             </div>
-            <div className="ui-g-12 ui-md-4">
-                <div className="card clearfix summary">
-                    <span className="title">Revenue</span>
-                    <span className="detail">Income for today</span>
-                    <span className="count revenue">$3,200</span>
+            <div className="col-12 lg:col-6 xl:col-3">
+                <div className="card mb-0">
+                    <div className="flex justify-content-between mb-3">
+                        <div>
+                            <span className="block text-500 font-medium mb-3">Ativos disponíveis</span>
+                            <div className="text-900 font-medium text-xl">28441</div>
+                        </div>
+                        <div className="flex align-items-center justify-content-center bg-cyan-100 border-round" style={{ width: '2.5rem', height: '2.5rem' }}>
+                            <i className="pi pi-inbox text-cyan-500 text-xl" />
+                        </div>
+                    </div>
+                    <span className="text-green-500 font-medium">520 </span>
+                    <span className="text-500">novos registrados</span>
+                </div>
+            </div>
+            <div className="col-12 lg:col-6 xl:col-3">
+                <div className="card mb-0">
+                    <div className="flex justify-content-between mb-3">
+                        <div>
+                            <span className="block text-500 font-medium mb-3">Saldo do dia</span>
+                            <div className="text-900 font-medium text-xl">R$ 15.000.000,00</div>
+                        </div>
+                        <div className="flex align-items-center justify-content-center bg-purple-100 border-round" style={{ width: '2.5rem', height: '2.5rem' }}>
+                            <i className="pi pi-money-bill text-purple-500 text-xl" />
+                        </div>
+                    </div>
+                    <span className="text-green-500 font-medium">15% </span>
+                    <span className="text-500">de rendimento</span>
                 </div>
             </div>
 
-            <div className="ui-g-12 ui-md-6 ui-lg-3">
-                <div className="highlight-box">
-                    <div className="initials" style={{backgroundColor:'#007be5',color:'#00448f'}}>TV</div>
-                    <div className="card">
-                        <span className="fa fa-eye"/>
-                        <span>Total Views</span>
-                        <span className="count">523</span>
-                    </div>
-                </div>
-            </div>
-            <div className="ui-g-12 ui-md-6 ui-lg-3">
-                <div className="highlight-box">
-                    <div className="initials" style={{backgroundColor:'#ef6262',color:'#a83d3b'}}>TI</div>
-                    <div className="card">
-                        <span className="fa fa-question-circle"/>
-                        <span>Total Issues</span>
-                        <span className="count">81</span>
-                    </div>
-                </div>
-            </div>
-            <div className="ui-g-12 ui-md-6 ui-lg-3">
-                <div className="highlight-box">
-                    <div className="initials" style={{backgroundColor:'#20d077',color:'#038d4a'}}>OI</div>
-                    <div className="card">
-                        <span className="fa fa-question-circle-o"/>
-                        <span>Open Issues</span>
-                        <span className="count">21</span>
-                    </div>
-                </div>
-            </div>
-            <div className="ui-g-12 ui-md-6 ui-lg-3">
-                <div className="highlight-box">
-                    <div className="initials" style={{backgroundColor:'#f9c851',color:'#b58c2b'}}>CI</div>
-                    <div className="card">
-                        <span className="fa fa-check"/>
-                        <span>Closed Issues</span>
-                        <span className="count">60</span>
-                    </div>
-                </div>
-            </div>
-            <div className="ui-g-12 ui-md-6 ui-lg-4">
-                <Panel header="Tasks" style={{height: '100%'}}>
-                    <ul className='task-list'>
-                        <li>
-                            <Checkbox value="task1" onChange={this.onTaskChange} checked={this.state.tasks.indexOf('task1')>-1?true:false}></Checkbox>
-                            <span className="task-name">Sales Reports</span>
-                            <Button icon="fa-check"/>
-                        </li>
-                        <li>
-                            <Checkbox value="task2" onChange={this.onTaskChange} checked={this.state.tasks.indexOf('task2')>-1?true:false}></Checkbox>
-                            <span className="task-name">Pay Invoices</span>
-                            <Button icon="fa-check"/>
-                        </li>
-                        <li>
-                            <Checkbox value="task3" onChange={this.onTaskChange} checked={this.state.tasks.indexOf('task3')>-1?true:false}></Checkbox>
-                            <span className="task-name">Dinner with Tony</span>
-                            <Button icon="fa-check"/>
-                        </li>
-                        <li>
-                            <Checkbox value="task4" onChange={this.onTaskChange} checked={this.state.tasks.indexOf('task4')>-1?true:false}></Checkbox>
-                            <span className="task-name">Client Meeting</span>
-                            <Button icon="fa-check"/>
-                        </li>
-                        <li>
-                            <Checkbox value="task5" onChange={this.onTaskChange} checked={this.state.tasks.indexOf('task5')>-1?true:false}></Checkbox>
-                            <span className="task-name">New Theme</span>
-                            <Button icon="fa-check"/>
-                        </li>
-                        <li>
-                            <Checkbox value="task6" onChange={this.onTaskChange} checked={this.state.tasks.indexOf('task6')>-1?true:false}></Checkbox>
-                            <span className="task-name">Flight Ticket</span>
-                            <Button icon="fa-check"/>
-                        </li>
-                    </ul>
-                </Panel>
-            </div>
-            <div className="ui-g-12 ui-md-6 ui-lg-4 ui-fluid contact-form">
-                <Panel header="Contact Us" style={{height: '100%'}}>
-                    <div className="ui-g">
-                        <div className="ui-g-12">
-                            <Dropdown value={this.state.city} options={cities} placeholder="Select a City" onChange={this.onCityChange} autoWidth={false} />
-                        </div>
-                        <div className="ui-g-12">
-                            <InputText type="text" placeholder="Name" />
-                        </div>
-                        <div className="ui-g-12">
-                            <InputText type="text" placeholder="Age" />
-                        </div>
-                        <div className="ui-g-12">
-                            <InputText type="text" placeholder="Message" />
-                        </div>
-                        <div className="ui-g-12">
-                            <Button type="button" label="Send" icon="fa-send"/>
-                        </div>
-                    </div>
-                </Panel>
-            </div>
+            <div className="col-12 xl:col-6">
 
-            <div className="ui-g-12 ui-lg-4">
-                <Panel header="Contacts">
-                    <ul className="contacts">
-                        <li>
-                            <a>
-                            <img src="assets/layout/images/avatar_1.png" width="35" alt="avatar1"/>
-                            <span className="name">Claire Williams</span>
-                            <span className="email">clare@pf-omega.com</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                <img src="assets/layout/images/avatar_2.png" width="35" alt="avatar2"/>
-                                <span className="name">Jason Dourne</span>
-                                <span className="email">jason@pf-omega.com</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                <img src="assets/layout/images/avatar_3.png" width="35" alt="avatar3"/>
-                                <span className="name">Jane Davidson</span>
-                                <span className="email">jane@pf-omega.com</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                <img src="assets/layout/images/avatar_4.png" width="35" alt="avatar4"/>
-                                <span className="name">Tony Corleone</span>
-                                <span className="email">tony@pf-omega.com</span>
-                            </a>
-                        </li>
-                    </ul>
-                </Panel>
-            </div>
-            <div className="ui-g-12 ui-md-4">
                 <div className="card">
-                    <h1 style={{fontSize:'16px'}}>Recent Sales</h1>
-                    <DataTable value={this.state.cars}  style={{marginBottom: '20px'}} responsive={true}
-                               selectionMode="single" selection={this.state.selectedCar} onSelectionChange={(e) => this.setState({selectedCar: e.data})}>
-                        <Column field="vin" header="Vin" sortable={true} />
-                        <Column field="year" header="Year" sortable={true} />
-                        <Column field="brand" header="Brand" sortable={true} />
-                        <Column field="color" header="Color" sortable={true} />
+                    <h5>Carteira por enquadramento</h5>
+                    <Chart type="pie" data={pieData} options={lineOptions} />
+                </div>
+
+                <div className="card">
+                    <h5>Carteira por enquadramento</h5>
+                    <DataTable /*value={products}*/ rows={5} paginator responsiveLayout="scroll">
+                        <Column field="name" header="Nome do ativo" sortable style={{ width: '35%' }} />
+                        <Column field="price" header="Valor" sortable style={{ width: '35%' }} body={(data) => formatCurrency(data.price)} />
+                        <Column
+                            header="%"
+                            style={{ width: '15%' }}
+                            body={() => (
+                                <>
+                                    <Button icon="pi pi-search" type="button" className="p-button-text" />
+                                </>
+                            )}
+                        />
                     </DataTable>
                 </div>
-            </div>
-            <div className="ui-g-12 ui-md-8">
                 <div className="card">
-                    <Chart type="line" data={lineData}/>
-                </div>
-            </div>
-            <div className="ui-g-12 ui-md-8">
-                <Panel header="Calendar" style={{height: '100%'}}> 
-                    <Schedule events={events} header={scheduleHeader} defaultDate="2017-02-01" eventLimit={4}></Schedule>
-                </Panel>
-            </div>
-
-            <div className="ui-g-12 ui-md-4">
-                <Panel header="Activity" style={{height:'100%'}}>
-                    <div className="activity-header">
-                        <div className="ui-g">
-                            <div className="ui-g-6">
-                                <span style={{fontWeight:'bold'}}>Last Activity</span>
-                                <p>Updated 1 minute ago</p>
-                            </div>
-                            <div className="ui-g-6" style={{textAlign:'right'}}>
-                                <Button label="Refresh" icon="fa-refresh" />
-                            </div>
+                    <div className="flex justify-content-between align-items-center mb-5">
+                        <h5>Ativos com maiores rendimentos</h5>
+                        <div>
+                            <Button type="button" icon="pi pi-ellipsis-v" className="p-button-rounded p-button-text p-button-plain" onClick={(event) => menu1.current.toggle(event)} />
+                            <Menu
+                                ref={menu1}
+                                popup
+                                model={[
+                                    { label: 'Add New', icon: 'pi pi-fw pi-plus' },
+                                    { label: 'Remove', icon: 'pi pi-fw pi-minus' }
+                                ]}
+                            />
                         </div>
                     </div>
-                    <ul className="activity-list">
-                        <li>
-                            <div className="count">$900</div>
-                            <div className="ui-g">
-                                <div className="ui-g-6">Income</div>
-                                <div className="ui-g-6">95%</div>
+                    <ul className="list-none p-0 m-0">
+                        <li className="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                            <div>
+                                <span className="text-900 font-medium mr-2 mb-1 md:mb-0">Títulos do Tesouro Nacional (SELIC)</span>
+                                <div className="mt-1 text-600">Renda Fixa</div>
+                            </div>
+                            <div className="mt-2 md:mt-0 flex align-items-center">
+                                <div className="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style={{ height: '8px' }}>
+                                    <div className="bg-orange-500 h-full" style={{ width: '50%' }} />
+                                </div>
+                                <span className="text-orange-500 ml-3 font-medium">%50</span>
                             </div>
                         </li>
-                        <li>
-                            <div className="count" style={{backgroundColor:'#f9c851'}}>$250</div>
-                            <div className="ui-g">
-                                <div className="ui-g-6">Tax</div>
-                                <div className="ui-g-6">24%</div>
+                        <li className="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                            <div>
+                                <span className="text-900 font-medium mr-2 mb-1 md:mb-0">Fundos de Renda Fixa 100% Títulos Públicos</span>
+                                <div className="mt-1 text-600">Renda Fixa</div>
+                            </div>
+                            <div className="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                                <div className="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style={{ height: '8px' }}>
+                                    <div className="bg-cyan-500 h-full" style={{ width: '16%' }} />
+                                </div>
+                                <span className="text-cyan-500 ml-3 font-medium">%16</span>
                             </div>
                         </li>
-                        <li>
-                            <div className="count" style={{backgroundColor:'#20d077'}}>$125</div>
-                            <div className="ui-g">
-                                <div className="ui-g-6">Invoices</div>
-                                <div className="ui-g-6">55%</div>
+                        <li className="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                            <div>
+                                <span className="text-900 font-medium mr-2 mb-1 md:mb-0">Fundos de Renda Fixa (CVM)</span>
+                                <div className="mt-1 text-600">Renda Fixa</div>
+                            </div>
+                            <div className="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                                <div className="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style={{ height: '8px' }}>
+                                    <div className="bg-pink-500 h-full" style={{ width: '67%' }} />
+                                </div>
+                                <span className="text-pink-500 ml-3 font-medium">%67</span>
                             </div>
                         </li>
-                        <li>
-                            <div className="count" style={{backgroundColor:'#f9c851'}}>$250</div>
-                            <div className="ui-g">
-                                <div className="ui-g-6">Expenses</div>
-                                <div className="ui-g-6">15%</div>
+                        <li className="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                            <div>
+                                <span className="text-900 font-medium mr-2 mb-1 md:mb-0">Fundos de Ações</span>
+                                <div className="mt-1 text-600">Renda Variável</div>
+                            </div>
+                            <div className="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                                <div className="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style={{ height: '8px' }}>
+                                    <div className="bg-green-500 h-full" style={{ width: '35%' }} />
+                                </div>
+                                <span className="text-green-500 ml-3 font-medium">%35</span>
                             </div>
                         </li>
-                        <li>
-                            <div className="count" style={{backgroundColor:'#007be5'}}>$350</div>
-                            <div className="ui-g">
-                                <div className="ui-g-6">Bonus</div>
-                                <div className="ui-g-6">5%</div>
+                        <li className="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                            <div>
+                                <span className="text-900 font-medium mr-2 mb-1 md:mb-0">Fundos de Ações - BDR Nível I</span>
+                                <div className="mt-1 text-600">Exterior</div>
+                            </div>
+                            <div className="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                                <div className="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style={{ height: '8px' }}>
+                                    <div className="bg-purple-500 h-full" style={{ width: '75%' }} />
+                                </div>
+                                <span className="text-purple-500 ml-3 font-medium">%75</span>
                             </div>
                         </li>
-                        <li>
-                            <div className="count" style={{backgroundColor:'#ef6262'}}>$500</div>
-                            <div className="ui-g">
-                                <div className="ui-g-6">Revenue</div>
-                                <div className="ui-g-6">25%</div>
+                        <li className="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                            <div>
+                                <span className="text-900 font-medium mr-2 mb-1 md:mb-0">BB AÇÕES CONSUMO FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO	</span>
+                                <div className="mt-1 text-600">Renda Variável</div>
+                            </div>
+                            <div className="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                                <div className="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style={{ height: '8px' }}>
+                                    <div className="bg-teal-500 h-full" style={{ width: '40%' }} />
+                                </div>
+                                <span className="text-teal-500 ml-3 font-medium">%40</span>
                             </div>
                         </li>
                     </ul>
-                </Panel>
+                </div>
+            </div>
+
+            <div className="col-12 xl:col-6">
+                <div className="card">
+                    <h5>Percentual Por Segmento</h5>
+                    <Chart type="line" data={lineData} options={lineOptions} />
+                </div>
+
+                <div className="card">
+                    <h5>Percentual Por Segmento</h5>
+                    <Chart type="bar" data={lineData} options={lineOptions} />
+                </div>
+
+                <div className="card">
+                    <div className="flex align-items-center justify-content-between mb-4">
+                        <h5>Notícias</h5>
+                        <div>
+                            <Button type="button" icon="pi pi-ellipsis-v" className="p-button-rounded p-button-text p-button-plain" onClick={(event) => menu2.current.toggle(event)} />
+                            <Menu
+                                ref={menu2}
+                                popup
+                                model={[
+                                    { label: 'Add New', icon: 'pi pi-fw pi-plus' },
+                                    { label: 'Remove', icon: 'pi pi-fw pi-minus' }
+                                ]}
+                            />
+                        </div>
+                    </div>
+
+                    <span className="block text-600 font-medium mb-3">TODAY</span>
+                    <ul className="p-0 mx-0 mt-0 mb-4 list-none">
+                        <li className="flex align-items-center py-2 border-bottom-1 surface-border">
+                            <div className="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
+                                <i className="pi pi-dollar text-xl text-blue-500" />
+                            </div>
+                            <span className="text-900 line-height-3">
+                                Infomoney
+                                <span className="text-700">
+                                    {' '}
+                                    BC trouxe mensagens duras sobre inflação para direcionar manutenção do ritmo de cortes <span className="text-blue-500"></span>
+                                </span>
+                            </span>
+                        </li>
+                        <li className="flex align-items-center py-2">
+                            <div className="w-3rem h-3rem flex align-items-center justify-content-center bg-orange-100 border-circle mr-3 flex-shrink-0">
+                                <i className="pi pi-download text-xl text-orange-500" />
+                            </div>
+                            <span className="text-700 line-height-3">
+                                BC reduz Selic para 12,75% e indica futuros cortes de mesma magnitude<span className="text-blue-500 font-medium"> 12,75%</span>
+                            </span>
+                        </li>
+                    </ul>
+
+                    <span className="block text-600 font-medium mb-3">ONTEM</span>
+                    <ul className="p-0 m-0 list-none">
+                        <li className="flex align-items-center py-2 border-bottom-1 surface-border">
+                            <div className="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
+                                <i className="pi pi-dollar text-xl text-blue-500" />
+                            </div>
+                            <span className="text-900 line-height-3">
+                                Dólar
+                                <span className="text-700">
+                                    {' '}
+                                    sobe após Federal Reserve deixar porta aberta para novas altas de juros <span className="text-blue-500">59$</span>
+                                </span>
+                            </span>
+                        </li>
+                        <li className="flex align-items-center py-2 border-bottom-1 surface-border">
+                            <div className="w-3rem h-3rem flex align-items-center justify-content-center bg-pink-100 border-circle mr-3 flex-shrink-0">
+                                <i className="pi pi-question text-xl text-pink-500" />
+                            </div>
+                            <span className="text-900 line-height-3">
+                                Lojas Renner:
+                                <span className="text-700"> ações caem até 5% após Shein integrar Remessa Conforme, mas se recuperam</span>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
         </div>
-    }
+    );
 }
+
+const comparisonFn = function (prevProps, nextProps) {
+    return (prevProps.location.pathname === nextProps.location.pathname) && (prevProps.colorMode === nextProps.colorMode);
+};
+
+export default React.memo(Dashboard, comparisonFn);

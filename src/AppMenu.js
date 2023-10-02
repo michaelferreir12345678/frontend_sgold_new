@@ -1,133 +1,114 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
+import {Ripple} from "primereact/ripple";
+import { Badge } from 'primereact/badge';
 
-class AppSubmenu extends Component {
+const AppSubmenu = (props) => {
 
-    static defaultProps = {
-        className: null,
-        items: null,
-        onMenuItemClick: null,
-        onRootItemClick: null,
-        root: false,
-        layoutMode: null,
-        menuActive: false
-    }
+    const [activeIndex, setActiveIndex] = useState(null)
 
-    static propTypes = {
-        className: PropTypes.string,
-        items: PropTypes.array,
-        onMenuItemClick: PropTypes.func,
-        onRootItemClick: PropTypes.func,
-        root: PropTypes.bool,
-        layoutMode: PropTypes.string,
-        menuActive: PropTypes.bool
-    }
-    
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
-    
-    onMenuItemClick(event, item, index) {
+    const onMenuItemClick = (event, item, index) => {
         //avoid processing disabled items
-        if(item.disabled) {
+        if (item.disabled) {
             event.preventDefault();
             return true;
         }
-        
-        if(this.props.root && this.props.onRootItemClick) {
-            this.props.onRootItemClick({
-                originalEvent: event,
-                item: item
-            });
-        }
-                        
+
         //execute command
-        if(item.command) {
-            item.command({originalEvent: event, item: item});
+        if (item.command) {
+            item.command({ originalEvent: event, item: item });
         }
 
-        //prevent hash change
-        if(item.items || !item.url) {
-            event.preventDefault();
-        }
-
-        if(index === this.state.activeIndex)
-            this.setState({activeIndex: null});    
+        if (index === activeIndex)
+            setActiveIndex(null);
         else
-            this.setState({activeIndex: index});
+            setActiveIndex(index);
 
-        if(this.props.onMenuItemClick) {
-            this.props.onMenuItemClick({
+        if (props.onMenuItemClick) {
+            props.onMenuItemClick({
                 originalEvent: event,
                 item: item
             });
         }
-    } 
-    
-    onMenuItemMouseEnter(index) {
-        if(this.props.root && this.props.menuActive && this.isHorizontalOrSlim()) {
-            this.setState({activeIndex: index});
-        }
     }
-    
-    componentWillReceiveProps(nextProps, nextState) {
-        if(this.isHorizontalOrSlim() && this.props.menuActive && !nextProps.menuActive) {
-            this.setState({activeIndex: null});
-        }
-    }
-    
-    isHorizontalOrSlim() {
-        return (this.props.layoutMode === 'horizontal' || this.props.layoutMode === 'slim');
-    }
-    
-    render() {
-        var items = this.props.items && this.props.items.map((item, i) => {
-            let active = this.state.activeIndex === i;
-            let styleClass = classNames(item.badgeStyleClass, {'active-menuitem': active});
-            let badge = item.badge && <span className="menuitem-badge">{item.badge}</span>;
-            let submenuIcon = item.items && <i className="fa fa-fw fa-angle-down menuitem-toggle-icon"></i>;
 
-            return <li className={styleClass} key={i}>
-                        {item.items && this.props.root===true && <div className='arrow'></div>}
-                        <a href={item.url} onClick={(e) => this.onMenuItemClick(e, item, i)} target={item.target}
-                            onMouseEnter={(e) => this.onMenuItemMouseEnter(i)}>
-                            <i className={item.icon}></i>
-                            <span>{item.label}</span>
-                            {submenuIcon}
-                            {badge}
-                        </a>
-                        <AppSubmenu items={item.items} onMenuItemClick={this.props.onMenuItemClick} layoutMode={this.props.layoutMode} 
-                                    menuActive={this.props.menuActive} />
-                    </li>
-        });
-        
-        return items?<ul className={this.props.className}>{items}</ul>:null;
+    const onKeyDown = (event) => {
+        if (event.code === 'Enter' || event.code === 'Space'){
+            event.preventDefault();
+            event.target.click();
+        }
     }
+
+    const renderLinkContent = (item) => {
+        let submenuIcon = item.items && <i className="pi pi-fw pi-angle-down menuitem-toggle-icon"></i>;
+        let badge = item.badge && <Badge value={item.badge} />
+
+        return (
+            <React.Fragment>
+                <i className={item.icon}></i>
+                <span>{item.label}</span>
+                {submenuIcon}
+                {badge}
+                <Ripple/>
+            </React.Fragment>
+        );
+    }
+
+    const renderLink = (item, i) => {
+        let content = renderLinkContent(item);
+
+        if (item.to) {
+            return (
+                <NavLink aria-label={item.label} onKeyDown={onKeyDown} role="menuitem" className="p-ripple" activeClassName="router-link-active router-link-exact-active" to={item.to} onClick={(e) => onMenuItemClick(e, item, i)} exact target={item.target}>
+                    {content}
+                </NavLink>
+            )
+        }
+        else {
+            return (
+                <a tabIndex="0" aria-label={item.label} onKeyDown={onKeyDown} role="menuitem" href={item.url} className="p-ripple" onClick={(e) => onMenuItemClick(e, item, i)} target={item.target}>
+                    {content}
+                </a>
+            );
+        }
+    }
+
+    let items = props.items && props.items.map((item, i) => {
+        let active = activeIndex === i;
+        let styleClass = classNames(item.badgeStyleClass, {'layout-menuitem-category': props.root, 'active-menuitem': active && !item.to });
+
+        if(props.root) {
+            return (
+                <li className={styleClass} key={i} role="none">
+                    {props.root === true && <React.Fragment>
+                        <div className="layout-menuitem-root-text" aria-label={item.label}>{item.label}</div>
+                        <AppSubmenu items={item.items} onMenuItemClick={props.onMenuItemClick} />
+                    </React.Fragment>}
+                </li>
+            );
+        }
+        else {
+            return (
+                <li className={styleClass} key={i} role="none">
+                    {renderLink(item, i)}
+                    <CSSTransition classNames="layout-submenu-wrapper" timeout={{ enter: 1000, exit: 450 }} in={active} unmountOnExit>
+                        <AppSubmenu items={item.items} onMenuItemClick={props.onMenuItemClick} />
+                    </CSSTransition>
+                </li>
+            );
+        }
+    });
+
+    return items ? <ul className={props.className} role="menu">{items}</ul> : null;
 }
 
-export class AppMenu extends Component {
+export const AppMenu = (props) => {
 
-    static defaultProps = {
-        model: null,
-        onMenuItemClick: null,
-        onRootMenuItemClick: null,
-        layoutMode: null,
-        active: false
-    }
-
-    static propTypes = {
-        model: PropTypes.array,
-        layoutMode: PropTypes.string,
-        onMenuItemClick: PropTypes.func,
-        onRootMenuItemClick: PropTypes.func,
-        active: PropTypes.bool
-    }
-
-    render() {
-        return <div className="menu"><AppSubmenu items={this.props.model} className="layout-main-menu"
-                menuActive={this.props.active} onRootItemClick={this.props.onRootMenuItemClick}
-                onMenuItemClick={this.props.onMenuItemClick} root={true} layoutMode={this.props.layoutMode}/></div>
-    }
+    return (
+        <div className="layout-menu-container">
+            <AppSubmenu items={props.model} className="layout-menu"  onMenuItemClick={props.onMenuItemClick} root={true} role="menu" />
+        </div>
+    );
 }

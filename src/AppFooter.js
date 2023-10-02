@@ -1,13 +1,12 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-export class AppFooter extends Component {
+export const AppFooter = (props) => {
 
-    render() {
-        return  (
-        <div className="footer">
-            <img src="assets/layout/images/logo-colored.png" alt="" width="32"/>
-            <span className="footer-text">PrimeReact Sigma Theme and Layout</span>
+    return (
+        <div className="layout-footer">
+            by
+            {/* <span className="font-medium ml-2">Instituto de tecnologia da informação e comunicação</span> */}
+            <img src={props.layoutColorMode === 'light' ? 'assets/layout/images/logo-ITIC-com-nome-lado.jpg' : 'assets/layout/images/logo-ITIC-com-nome-lado.jpg'} alt="Logo" style={{marginLeft:"15px"}} height="40" className="mr-2" />
         </div>
-        );
-    }
+    );
 }

@@ -1,59 +1,47 @@
-import React, { Component } from 'react';
-import {InputText} from 'primereact/components/inputtext/InputText'
-import PropTypes from 'prop-types';
+import React  from 'react';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames';
+import { LoginService } from './service/util/LoginService';
 
-export class AppTopbar extends Component {
+export const AppTopbar = (props) => {
 
-    static defaultProps = {
-        topbarMenuActive: null,
-        onToggleMenu: null,
-        onTopbarMobileMenuButtonClick: null
-    }
+    const loginService = new LoginService();
 
-    static propTypes = {
-        topbarMenuActive: PropTypes.bool,
-        onToggleMenu: PropTypes.func.isRequired,
-        onTopbarMobileMenuButtonClick: PropTypes.func.isRequired
-    }
+    return (
+        <div className="layout-topbar">
+            <Link to="/" className="layout-topbar-logo">
+                <img src={props.layoutColorMode === 'light' ? 'assets/layout/images/logo_SGprev1.png' : 'assets/layout/images/logo_SGprev1.png'} alt="logo"/>
+                {/* <span>SG.Prev</span> */}
+            </Link>
 
-    constructor() {
-        super();
-        this.state = {};
-    }
+            <button type="button" className="p-link  layout-menu-button layout-topbar-button" onClick={props.onToggleMenuClick}>
+                <i className="pi pi-bars"/>
+            </button>
 
-    render() {
-        let topbarClass = classNames('animated',{'topbar-icons-visible flipInX':this.props.topbarMenuActive, 'flipOutX':!this.props.topbarMenuActive})
+            <button type="button" className="p-link layout-topbar-menu-button layout-topbar-button" onClick={props.onMobileTopbarMenuClick}>
+                <i className="pi pi-ellipsis-v" />
+            </button>
 
-        return (
-            <div className="topbar clearfix">
-                <a id="omega-menu-button" onClick={this.props.onToggleMenu}>
-                    <span className="fa fa-bars"/>
-                </a>
-                <span className="topbar-title"/>
-                <a id="options-menu-button" onClick={this.props.onTopbarMobileMenuButtonClick}>
-                    <span className="fa fa-ellipsis-h"/>
-                </a>
-                <div id="topbar-icons" className={topbarClass}>
-                    <span className="topbar-search">
-                        <InputText type="text" placeholder="Search" />
-                        <span className="topbar-search-icon fa fa-search"/>
-                    </span>
-                <a>
-                    <span className="topbar-item-text">Messages</span>
-                    <span className="topbar-icon fa fa-envelope-o animated swing"/>
-                    <span className="topbar-badge animated rubberBand">5</span>
-                </a>
-                <a>
-                    <span className="topbar-item-text">Settings</span>
-                    <span className="topbar-icon fa fa-gear"/>
-                </a>
-                <a>
-                    <span className="topbar-item-text">User</span>
-                    <span className="topbar-icon fa fa-user"/>
-                </a>
-            </div>
-            </div>
-        );
-    }
+                <ul className={classNames("layout-topbar-menu lg:flex origin-top", {'layout-topbar-menu-mobile-active': props.mobileTopbarMenuActive })}>
+                    <li>
+                        <button className="p-link layout-topbar-button" onClick={props.onMobileSubTopbarMenuClick}>
+                            <i className="pi pi-calendar"/>
+                            <span>Events</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button className="p-link layout-topbar-button" onClick={props.onMobileSubTopbarMenuClick}>
+                            <i className="pi pi-cog"/>
+                            <span>Settings</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button className="p-link layout-topbar-button" onClick={()=>loginService.sair()}>
+                            <i className="pi pi-user"/>
+                            <span>Sair</span>
+                        </button>
+                    </li>
+                </ul>
+        </div>
+    );
 }
