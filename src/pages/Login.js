@@ -12,17 +12,18 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [checked, setChecked] = useState(false);
     const toast = useRef(null)
-    // const [submitted, setSubmitted] = useState(false);
     const [objetoDialog, setObjetoDialog] = useState(false);
     const [objetoDialogCodigoRecuperarSenha, setObjetoDialogCodigoRecuperarSenha] = useState(false);
     const [codigoRecuperarSenha, setCodigoRecuperarSenha] = useState('');
     const [novaSenha, setNovaSenha] = useState('');
     const [dialogCadastroNovaSenha, setdialogCadastroNovaSenha] = useState(false);
-    const { login, recuperarSenha, recuperarSenhaCodigo, loading } = LoginService();
+    const [loading, setLoading] = useState(false);
+    const loginService = new LoginService();
 
 
     const fazerLogin = () => {
-        login(email, password, mostrarMensagemErroLogin);
+        setLoading(true);
+        loginService.login(email, password, mostrarMensagemErroLogin);
     }
 
     const mostrarMensagemErroLogin = (erro) => {
@@ -34,20 +35,24 @@ const Login = () => {
     }
 
     const recuperacaoSenha = () => {
-        recuperarSenha(email, mostrarMensagemSucesso)
+        setLoading(true)
+        loginService.recuperarSenha(email, mostrarMensagemSucesso)
             .then(res => {
                 setObjetoDialog(false);
                 setObjetoDialogCodigoRecuperarSenha(true)
+                setLoading(false)
             })
     };
 
     const envioCodigoRecuperacaoSenha = () => {
-        recuperarSenhaCodigo(email, novaSenha, codigoRecuperarSenha, mostrarMensagemSucesso)
+        setLoading(true)
+        loginService.recuperarSenhaCodigo(email, novaSenha, codigoRecuperarSenha, mostrarMensagemSucesso)
             .then(res => {
                 console.log(res.data)
                 mostrarMensagemSucesso("Senha alterada com sucesso!!");
                 setObjetoDialogCodigoRecuperarSenha(false);
                 setdialogCadastroNovaSenha(false)
+                setLoading(false);
             });
     }
 
@@ -124,7 +129,7 @@ const Login = () => {
                                     Esqueceu sua senha?
                                 </a>
                             </div>
-                            <Button loading={loading} onClick={() => fazerLogin()} label="Entrar" className="w-full p-3 text-xl" ></Button>
+                            <Button /*loading={loading}*/ onClick={() => fazerLogin()} label="Entrar" className="w-full p-3 text-xl" ></Button>
                         </div>
                     </div>
                 </div>
