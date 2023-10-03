@@ -11,7 +11,7 @@ export class ServiceBase {
 
     inicializarAxios() {
         this.axiosInstance = axios.create({
-            baseURL: process.env.REACT_APP_URL_API,
+            baseURL: 'http://13.48.92.250/api/',
         });
 
         this.axiosInstance.interceptors.request.use((config) => {
