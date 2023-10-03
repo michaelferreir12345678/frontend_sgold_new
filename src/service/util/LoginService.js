@@ -15,7 +15,7 @@ export class LoginService extends ServiceBase {
     login(email, senha, mensagemErro) {
         this.axiosInstance.post(this.url + "login", { 'email': email, 'senha': senha })
             .then(res => {
-                localStorage.setItem(this.CHAVE_TOKEN, res.data.token);
+                sessionStorage.setItem(this.CHAVE_TOKEN, res.data.token);
                 window.location.href = "/";
             })
             .catch(error => {
@@ -27,7 +27,7 @@ export class LoginService extends ServiceBase {
         // setLoading(true);
         return await axios({
             method: 'post',
-            url: 'http://localhost:8080/api/pessoa-gerenciamento/senha-codigo',
+            url: 'http://13.48.92.250/api/pessoa-gerenciamento/senha-codigo',
             data: { "email": email }
         })
             .then(res => {
@@ -41,7 +41,7 @@ export class LoginService extends ServiceBase {
         // setLoading(true)
         return await axios({
             method: 'post',
-            url: 'http://localhost:8080/api/pessoa-gerenciamento/senha-alterar',
+            url: 'http://13.48.92.250/api/pessoa-gerenciamento/senha-alterar',
             data: { "email": email, "senha": senha, "codigoRecuperacaoSenha": codigoRecuperacaoSenha }
         })
         //  .then(res => {
@@ -55,11 +55,11 @@ export class LoginService extends ServiceBase {
     }
 
     sair() {
-        localStorage.removeItem(this.CHAVE_TOKEN);
+        sessionStorage.removeItem(this.CHAVE_TOKEN);
     }
 
     getToken() {
-        return localStorage.getItem(this.CHAVE_TOKEN);
+        return sessionStorage.getItem(this.CHAVE_TOKEN);
     }
 }
 
