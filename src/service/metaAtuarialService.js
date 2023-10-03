@@ -1,4 +1,3 @@
-import axios from "axios";
 import { ServiceBase } from "./ServiceBase.js";
 
 export class metaAtuarialService extends ServiceBase {
