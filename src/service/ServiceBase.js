@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LoginService } from './util/LoginService';
+import { LoginService } from './LoginService';
 
 export class ServiceBase {
 
@@ -29,6 +29,7 @@ export class ServiceBase {
             return response;
         }, (erro) => {
             console.log(erro.response.status);
+            // eslint-disable-next-line
             if (erro.response.status == 401) {
                 if (!erro.request.response.includes("pessoa-gerenciamento/login")) {
                     new LoginService().sair();
@@ -39,7 +40,7 @@ export class ServiceBase {
         });
     }
 
-    
+
 
     listarTodos() {
         return this.axiosInstance.get(this.url);

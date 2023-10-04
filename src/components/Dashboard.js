@@ -47,7 +47,6 @@ const lineData = {
 };
 
 const Dashboard = (props) => {
-    const [products, setProducts] = useState(null);
     const menu1 = useRef(null);
     const menu2 = useRef(null);
     const [lineOptions, setLineOptions] = useState(null)

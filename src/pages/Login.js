@@ -5,7 +5,7 @@ import { Password } from 'primereact/password';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { Dialog } from 'primereact/dialog';
-import { LoginService } from '../service/util/LoginService';
+import { LoginService } from '../service/LoginService';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -98,10 +98,12 @@ const Login = () => {
         <div>
             <div style={{ marginTop: '100px' }} className=" flex flex-column align-items-center justify-content-center">
                 <Toast ref={toast} />
+                {/* eslint-disable-next-line */}
                 <img src='images/logo-ITIC.jpg' style={{ marginBottom: '10px', borderRadius: '10px' }} />
                 <div style={{ marginTop: '10px', borderRadius: '56px', padding: '0.3rem', background: 'linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)' }}>
                     <div className="w-full surface-card py-8 px-5 sm:px-8" style={{ borderRadius: '53px' }}>
                         <div className="text-center mb-5">
+                            {/* eslint-disable-next-line */}
                             <img src='images/logo_SGprev.png' style={{ width: '180px', marginBottom: '10px', borderRadius: '10px' }} />
                             <div className="text-900 text-3xl font-medium mb-3">Bem vindo ao SG.Prev!</div>
                             <span className="text-600 font-medium">Entrar para continuar</span>
@@ -125,6 +127,7 @@ const Login = () => {
                                         Lembrar de mim
                                     </label>
                                 </div>
+                                {/* eslint-disable-next-line */}
                                 <a onClick={openNew} className="font-medium no-underline ml-2 text-right cursor-pointer" style={{ color: 'var(--primary-color)' }}>
                                     Esqueceu sua senha?
                                 </a>
